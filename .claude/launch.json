@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {"name": "watermark-ui", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 1420},
+    {"name": "synthetic-verification", "runtimeExecutable": "node", "runtimeArgs": ["scripts/serve-verification.mjs"], "port": 1421}
+  ]
+}

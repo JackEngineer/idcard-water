@@ -1,0 +1,34 @@
+[package]
+name = "idcard-water"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "idcard_water"
+crate-type = ["rlib", "cdylib", "staticlib"]
+
+[[bin]]
+name = "idcard-water"
+path = "src/main.rs"
+required-features = ["desktop"]
+
+[features]
+default = []
+desktop = ["dep:tauri", "dep:tauri-plugin-dialog", "dep:tauri-build"]
+custom-protocol = ["tauri/custom-protocol"]
+
+[dependencies]
+watermark-core = { path = "../crates/watermark-core" }
+serde = { version = "1", features = ["derive"] }
+tempfile = "3"
+uuid = { version = "1", features = ["v4"] }
+tauri = { version = "2", optional = true , features = [] }
+tauri-plugin-dialog = { version = "2", optional = true }
+
+[build-dependencies]
+tauri-build = { version = "2", optional = true , features = [] }
+
+[dev-dependencies]
+fontdue = "0.9"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+serde_json = "1"

@@ -1,0 +1,60 @@
+name: Check offline watermark
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@1.100.0
+        with:
+          components: rustfmt, clippy
+      - run: npm ci
+      - run: cargo fmt --all -- --check
+      - run: cargo test --workspace --locked
+      - run: cargo clippy --workspace --all-targets --features desktop --locked -- -D warnings
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npm run check:privacy
+      - name: Generate dependency notices
+        run: node scripts/collect-licenses.mjs
+      - name: Install independent metadata inspector
+        if: runner.os == 'macOS'
+        run: brew install exiftool
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+      - name: Inspect real synthetic exports
+        if: runner.os == 'macOS'
+        run: npm run verify:fixtures
+      - name: Add both macOS targets
+        if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - name: Build unsigned universal macOS app
+        if: runner.os == 'macOS'
+        run: npm run tauri -- build --target universal-apple-darwin --bundles app
+      - name: Build Windows x64 offline installer
+        if: runner.os == 'Windows'
+        run: npm run tauri -- build --target x86_64-pc-windows-msvc --bundles nsis
+      - uses: actions/upload-artifact@v4
+        with:
+          name: development-package-${{ matrix.os }}
+          path: |
+            target/universal-apple-darwin/release/bundle/macos/
+            target/x86_64-pc-windows-msvc/release/bundle/nsis/
+          if-no-files-found: error

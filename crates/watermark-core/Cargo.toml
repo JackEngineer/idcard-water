@@ -1,0 +1,13 @@
+[package]
+name = "watermark-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+fontdue = "0.9"
+moxcms = "0.7"
+thiserror = "2"
+
+[dev-dependencies]
+png = "0.18"

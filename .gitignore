@@ -1,0 +1,13 @@
+/target/
+/node_modules/
+/dist/
+/.verification/
+/artifacts/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+/src-tauri/target/
+/src-tauri/gen/
+/.claude/settings.local.json
