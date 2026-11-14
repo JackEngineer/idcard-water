@@ -119,6 +119,7 @@ export function Editor({native}: {native: NativeClient}) {
         <p className="workspace-note"><LockKeyhole size={14}/>照片与水印内容不上传，不保留编辑历史。</p>
       </section>
       <aside className="settings" aria-label="水印与导出设置">
+        <div className="settings-editor">
         <div className="settings-heading"><span className="eyebrow">02 / 水印</span><h2>说清楚，这张照片的用途</h2><p>建议写明接收方、办理事项和日期。</p></div>
         <fieldset disabled={busy} className="watermark-fields"><div className="field-heading"><label htmlFor="watermark-text">水印内容</label><span className={[...draft.text].length > 200 ? 'invalid-count' : ''}>{[...draft.text].length} / 200</span></div>
           <textarea id="watermark-text" rows={4} placeholder={'仅供【接收方】\n办理【具体事项】使用'} value={draft.text} onChange={event => updateDraft({text:event.target.value})} aria-describedby="text-guidance"/>
@@ -132,13 +133,16 @@ export function Editor({native}: {native: NativeClient}) {
             <button className="text-button" type="button" onClick={() => updateDraft({...defaultWatermark(),text:draft.text})}>恢复默认样式</button>
           </div></details>
         </fieldset>
+        </div>
         <div className="export-section"><span className="eyebrow">03 / 另存</span><div className="field-heading"><label htmlFor="export-format">导出格式</label><span>保持原分辨率</span></div><select id="export-format" value={format} disabled={busy} onChange={event => {setFormat(event.target.value as OutputFormat);setReport(null);}}><option value="jpeg">JPEG · 适合日常发送</option><option value="png">PNG · 无损保存合成像素</option></select>
           <button className="primary-button" disabled={!canExport} onClick={() => void exportImages(false)}><ArrowDownToLine size={17}/>{document.phase === 'exporting' ? '正在另存…' : '导出当前图片'}</button>
           {document.images.length === 2 && <button className="secondary-button export-all" disabled={!canExport} onClick={() => void exportImages(true)}><CheckCheck size={17}/>导出全部 2 张</button>}
           <p className="export-help">{blank ? '输入水印内容后，即可预览并导出。' : '每次选择保存位置，不覆盖原图或已有文件。'}</p>
-        </div>
+        {(notice || report) && <div className="export-feedback">
         {notice && <p className="operation-notice" role="alert">{notice}</p>}
         {report && <div className="export-report" role="status"><strong>{report.results.every(item => item.status === 'success') ? '导出完成' : report.results.some(item => item.status === 'success') ? '部分图片未能导出' : '导出未完成'}</strong><ul>{report.results.map(item => <li key={item.sessionId}>{item.status === 'success' ? <><Check size={14}/><span>{item.outputName}</span></> : <span>{document.images.find(image => image.id === item.sessionId)?.displayName ?? '图片'}：{item.message}</span>}</li>)}</ul>{report.results.some(item => item.status === 'failed') && <button disabled={busy} onClick={() => void exportImages(false,true)}>重试失败项（沿用原批次水印）</button>}</div>}
+        </div>}
+        </div>
       </aside>
     </main>
     <footer className="app-footer"><span><ShieldCheck size={16}/>一份明确的用途声明，不是绝对的安全保证。</span><details><summary>隐私与使用须知</summary><p>应用不上传照片、不使用远程字体、不收集使用记录。输出会重新编码，不复制原图的 EXIF、GPS 或嵌入缩略图。水印仍可能被移除，无法阻止转发；系统云同步、备份、交换内存和截图不受本应用控制。关闭应用会释放会话，但不承诺安全擦除内存。请确认水印未遮挡必要信息，再发送给可信的接收方。</p></details></footer>
