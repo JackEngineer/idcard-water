@@ -15,4 +15,4 @@ const native: NativeClient = {
   startExport:request=>call('start_export',request),retryExport:(batchId,directoryToken)=>call('retry_export',{batchId,directoryToken}),
   subscribeImports:async()=>()=>{},
 };
-createRoot(document.getElementById('root')!).render(<><div style={{padding:'8px 24px',background:'#eee5c9',fontSize:11}}>合成数据验收。图片由 Rust 处理并真实另存；文件选择为测试替身。<button onClick={()=>{cancelNext=true;}}>下次取消文件夹选择</button></div><Editor native={native}/></>);
+createRoot(document.getElementById('root')!).render(<><div style={{padding:'8px 24px',background:'var(--caution-soft)',color:'var(--caution)',borderBottom:'1px solid var(--caution-border)',fontSize:11}}>合成数据验收。图片由 Rust 处理并真实另存；文件选择为测试替身。<button style={{textDecoration:'underline'}} onClick={()=>{cancelNext=true;}}>下次取消文件夹选择</button></div><Editor native={native}/></>);
